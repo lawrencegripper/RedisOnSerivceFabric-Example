@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="RedisHost" Version="1.0.0.3" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+   <ServiceTypes>
+      <StatelessServiceType ServiceTypeName="RedisHost" UseImplicitHost="true"/>
+   </ServiceTypes>
+   <CodePackage Name="code" Version="1.0.0.2">
+      <EntryPoint>
+         <ExeHost>
+            <Program>redis-server.exe</Program>
+            <Arguments>--maxheap 1g --port 6379</Arguments>
+            <WorkingFolder>Work</WorkingFolder>
+            <ConsoleRedirection FileRetentionCount="5" FileMaxSizeInKb="2048"/>
+         </ExeHost>
+      </EntryPoint>
+   </CodePackage>
+   <Resources>
+      <Endpoints>
+         <Endpoint Name="RedisTypeEndpoint" Protocol="tcp" Port="6379" Type="Input" />
+      </Endpoints>
+   </Resources>
+</ServiceManifest>
