@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ServiceManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="RedisHost" Version="1.0.0.3" xmlns="http://schemas.microsoft.com/2011/01/fabric">
    <ServiceTypes>
-      <StatelessServiceType ServiceTypeName="RedisHost" UseImplicitHost="true"/>
+      <StatelessServiceType ServiceTypeName="RedisHost" UseImplicitHost="true" />
    </ServiceTypes>
    <CodePackage Name="code" Version="1.0.0.2">
       <EntryPoint>

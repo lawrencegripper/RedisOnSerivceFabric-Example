@@ -33,4 +33,4 @@ Register-ServiceFabricApplicationType -ApplicationPathInImageStore 'Store\redish
 
 New-ServiceFabricApplication -ApplicationName 'fabric:/redishost' -ApplicationTypeName 'RedisHostAppType' -ApplicationTypeVersion 1.0.0.3
 
-New-ServiceFabricService -ApplicationName 'fabric:/redishost' -ServiceName 'fabric:/redishost/redishostservice' -ServiceTypeName RedisHost -stateless -instancecount 1 -PartitionSchemeSingleton
+#New-ServiceFabricService -ApplicationName 'fabric:/redishost' -ServiceName 'fabric:/redishost/redishostservice' -ServiceTypeName RedisHost -stateless -instancecount 1 -PartitionSchemeSingleton

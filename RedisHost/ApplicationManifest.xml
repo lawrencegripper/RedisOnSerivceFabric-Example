@@ -2,15 +2,17 @@
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="RedisHostAppType" ApplicationTypeVersion="1.0.0.3" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="RedisHost" ServiceManifestVersion="1.0.0.3" />
-    <ConfigOverrides/>
-    <Policies>
-      <RunAsPolicy CodePackageRef="code" UserRef="RedisUser" EntryPointType="Main"/>
-    </Policies>
   </ServiceManifestImport>
-  <Principals>
-    <Users>
-      <User Name="RedisUser">
-      </User>
-    </Users>
-  </Principals>
+  <ServiceTemplates>
+    <StatelessService ServiceTypeName="RedisHost" DefaultMoveCost="High" InstanceCount="1">
+      <SingletonPartition/>
+    </StatelessService>
+  </ServiceTemplates>
+   <DefaultServices>
+    <Service Name="RedisHost">
+      <StatelessService ServiceTypeName="RedisHost" DefaultMoveCost="High" InstanceCount="1" >
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+  </DefaultServices>
 </ApplicationManifest>
