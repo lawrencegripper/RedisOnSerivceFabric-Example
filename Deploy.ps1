@@ -10,18 +10,7 @@ Copy-ServiceFabricApplicationPackage -ApplicationPackagePath '.\RedisHost' -Imag
 Write-Host 'Registering application type...'
 Test-ServiceFabricApplicationPackage C:\Users\lawrencegripper\Source\Repos\RedisOnServiceFabric\RedisHost\
 
-$types = get-servicefabricapplicationtype RedisHostAppType
-if ($types)
-{
-    foreach ($type in $types)
-    {
-        Unregister-ServiceFabricApplicationType $type.ApplicationTypeName
-    }
-}
-
-Register-ServiceFabricApplicationType -ApplicationPathInImageStore 'Store\redishost'
-
-
+##For testing - clean up any existing deployments
 $service = get-ServiceFabricApplication -ApplicationName 'fabric:/redishost'
 if ($service)
 {
@@ -29,6 +18,19 @@ if ($service)
 }
 
 
-New-ServiceFabricApplication -ApplicationName 'fabric:/redishost' -ApplicationTypeName 'RedisHostAppType' -ApplicationTypeVersion 1.0
+$types = get-servicefabricapplicationtype RedisHostAppType
+if ($types)
+{
+    foreach ($type in $types)
+    {
+        Unregister-ServiceFabricApplicationType $type.ApplicationTypeName -ApplicationTypeVersion  $type.ApplicationTypeVersion -force
+    }
+}
+
+
+##Now lets register it again and deploy
+Register-ServiceFabricApplicationType -ApplicationPathInImageStore 'Store\redishost'
+
+New-ServiceFabricApplication -ApplicationName 'fabric:/redishost' -ApplicationTypeName 'RedisHostAppType' -ApplicationTypeVersion 1.0.0.3
 
 New-ServiceFabricService -ApplicationName 'fabric:/redishost' -ServiceName 'fabric:/redishost/redishostservice' -ServiceTypeName RedisHost -stateless -instancecount 1 -PartitionSchemeSingleton
