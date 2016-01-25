@@ -7,8 +7,8 @@
       <EntryPoint>
          <ExeHost>
             <Program>redis-server.exe</Program>
-            <Arguments>--maxheap 1g --port 6379</Arguments>
-            <WorkingFolder>Work</WorkingFolder>
+            <Arguments>.\redis.windows.conf</Arguments>
+            <WorkingFolder>CodePackage</WorkingFolder>
             <ConsoleRedirection FileRetentionCount="5" FileMaxSizeInKb="2048"/>
          </ExeHost>
       </EntryPoint>
