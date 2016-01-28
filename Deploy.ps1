@@ -1,24 +1,30 @@
 $ErrorActionPreference = "Stop"
 
+##Vars
+$appPackagePath = '.\RedisHost\'
+$appName = 'fabric:/redishost'
+$appType = 'RedisHostAppType'
+$appImageStoreName ='Store\redishost'
+
 ##Update this command to deploy to remote cluster as needed. 
 Connect-ServiceFabricCluster localhost:19000
 
 Write-Host 'Copying application package...'
 ##When deploying to azure cluster remove the imagestoreconnectionstring parameter
-Copy-ServiceFabricApplicationPackage -ApplicationPackagePath '.\RedisHost' -ImageStoreConnectionString 'file:C:\SfDevCluster\Data\ImageStoreShare' -ApplicationPackagePathInImageStore 'Store\redishost'
+Copy-ServiceFabricApplicationPackage -ApplicationPackagePath $appPackagePath -ImageStoreConnectionString 'file:C:\SfDevCluster\Data\ImageStoreShare' -ApplicationPackagePathInImageStore $appImageStoreName
 
 Write-Host 'Registering application type...'
-Test-ServiceFabricApplicationPackage C:\Users\lawrencegripper\Source\Repos\RedisOnServiceFabric\RedisHost\
+Test-ServiceFabricApplicationPackage $appPackagePath
 
 ##For testing - clean up any existing deployments
-$service = get-ServiceFabricApplication -ApplicationName 'fabric:/redishost'
+$service = get-ServiceFabricApplication -ApplicationName $appName
 if ($service)
 {
     remove-servicefabricapplication $service.ApplicationName -force
 }
 
 
-$types = get-servicefabricapplicationtype RedisHostAppType
+$types = get-servicefabricapplicationtype $appType
 if ($types)
 {
     foreach ($type in $types)
@@ -29,8 +35,7 @@ if ($types)
 
 
 ##Now lets register it again and deploy
-Register-ServiceFabricApplicationType -ApplicationPathInImageStore 'Store\redishost'
+Register-ServiceFabricApplicationType -ApplicationPathInImageStore $appImageStoreName
 
-New-ServiceFabricApplication -ApplicationName 'fabric:/redishost' -ApplicationTypeName 'RedisHostAppType' -ApplicationTypeVersion 1.0.0.3
+New-ServiceFabricApplication -ApplicationName $appName -ApplicationTypeName $appType -ApplicationTypeVersion 1.0.0.3
 
-#New-ServiceFabricService -ApplicationName 'fabric:/redishost' -ServiceName 'fabric:/redishost/redishostservice' -ServiceTypeName RedisHost -stateless -instancecount 1 -PartitionSchemeSingleton
