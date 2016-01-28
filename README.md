@@ -3,9 +3,9 @@ Quick example of running Redis as a service fabric service.
 
 Work in progress!
 
-Two branchs:
+Two versions in the repo:
 
-Master
+RedisWrapper
 ------
 This wraps redis in a Stateless service written in C# which keeps the process running. 
 
@@ -17,8 +17,6 @@ You can then use the naming service to discover where redis is, from other servi
 
 ```csharp
 
-        fabric:/redishost/RedisHost
-        
         //Replace the fabric address with tthe address of the redis service in your cluster. 
         ConnectionMultiplexer.Connect(GetInstanceEndpoints("fabric:/redishost/RedisHost").Single());
 
@@ -41,8 +39,12 @@ Simple Helper to discover the service from c# - LoFi version see full SF docs fo
         
 ```
 
-Implicit Host
+To deploy this open the VSSolution with the SF tools installed and publish. 
+
+RedisHost (ImplicitHost)
 ----------------
 
 This branch uses the implicit host option to avoid using a wrapper. 
 The downside is the service isn't published to the naming service so you need another discovery method. IMO this is pretty useless. 
+
+To deploy this version edit, with your params, then run Deploy.ps1. 
