@@ -26,7 +26,7 @@ You can then use the naming service to discover where redis is, from other servi
         await redisDb.ListLeftPushAsync(....);
 ```
         
-Simple Helper to discover the service from c#
+Simple Helper to discover the service from c# - LoFi version see full SF docs for best practices 
 
 ```csharp      
         private async Task<string[]> GetInstanceEndpoints(string fabricAddress)
