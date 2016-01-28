@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="RedisWrapperType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+   <Parameters>
+      <Parameter Name="EventSubscriber_InstanceCount" DefaultValue="-1" />
+      <Parameter Name="EventPublisher_InstanceCount" DefaultValue="-1" />
+      <Parameter Name="RedisHost_InstanceCount" DefaultValue="1" />
+   </Parameters>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="EventSubscriberPkg" ServiceManifestVersion="1.0.0" />
+      <ConfigOverrides />
+   </ServiceManifestImport>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="EventPublisherPkg" ServiceManifestVersion="1.0.0" />
+      <ConfigOverrides />
+   </ServiceManifestImport>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="RedisHostPkg" ServiceManifestVersion="1.0.0" />
+      <ConfigOverrides />
+   </ServiceManifestImport>
+   <DefaultServices>
+      <Service Name="EventSubscriber">
+         <StatelessService ServiceTypeName="EventSubscriberType" InstanceCount="[EventSubscriber_InstanceCount]">
+            <SingletonPartition />
+         </StatelessService>
+      </Service>
+      <Service Name="EventPublisher">
+         <StatelessService ServiceTypeName="EventPublisherType" InstanceCount="[EventPublisher_InstanceCount]">
+            <SingletonPartition />
+         </StatelessService>
+      </Service>
+      <Service Name="RedisHost">
+         <StatelessService ServiceTypeName="RedisHostType" DefaultMoveCost="High" InstanceCount="[RedisHost_InstanceCount]">
+            <SingletonPartition />
+         </StatelessService>
+      </Service>
+   </DefaultServices>
+</ApplicationManifest>

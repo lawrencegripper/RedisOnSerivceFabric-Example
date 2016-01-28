@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "RedisWrapper", "RedisWrapper\RedisWrapper.sfproj", "{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisHost", "RedisHost\RedisHost.csproj", "{F2142A91-6395-4BFC-BCA5-A138C758C8F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventPublisher", "EventPublisher\EventPublisher.csproj", "{0AAB40D6-6E16-4073-B082-0ABE720AC2D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventSubscriber", "EventSubscriber\EventSubscriber.csproj", "{4F8BD6A0-A753-4F84-B301-88EFFCCC3FE9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}.Debug|x64.ActiveCfg = Debug|x64
+		{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}.Debug|x64.Build.0 = Debug|x64
+		{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}.Debug|x64.Deploy.0 = Debug|x64
+		{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}.Release|x64.ActiveCfg = Release|x64
+		{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}.Release|x64.Build.0 = Release|x64
+		{5C848098-BB3F-4FEF-8C27-884EC7D2B5A5}.Release|x64.Deploy.0 = Release|x64
+		{F2142A91-6395-4BFC-BCA5-A138C758C8F4}.Debug|x64.ActiveCfg = Debug|x64
+		{F2142A91-6395-4BFC-BCA5-A138C758C8F4}.Debug|x64.Build.0 = Debug|x64
+		{F2142A91-6395-4BFC-BCA5-A138C758C8F4}.Release|x64.ActiveCfg = Release|x64
+		{F2142A91-6395-4BFC-BCA5-A138C758C8F4}.Release|x64.Build.0 = Release|x64
+		{0AAB40D6-6E16-4073-B082-0ABE720AC2D6}.Debug|x64.ActiveCfg = Debug|x64
+		{0AAB40D6-6E16-4073-B082-0ABE720AC2D6}.Debug|x64.Build.0 = Debug|x64
+		{0AAB40D6-6E16-4073-B082-0ABE720AC2D6}.Release|x64.ActiveCfg = Release|x64
+		{0AAB40D6-6E16-4073-B082-0ABE720AC2D6}.Release|x64.Build.0 = Release|x64
+		{4F8BD6A0-A753-4F84-B301-88EFFCCC3FE9}.Debug|x64.ActiveCfg = Debug|x64
+		{4F8BD6A0-A753-4F84-B301-88EFFCCC3FE9}.Debug|x64.Build.0 = Debug|x64
+		{4F8BD6A0-A753-4F84-B301-88EFFCCC3FE9}.Release|x64.ActiveCfg = Release|x64
+		{4F8BD6A0-A753-4F84-B301-88EFFCCC3FE9}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
