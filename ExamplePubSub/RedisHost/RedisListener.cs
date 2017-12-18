@@ -12,6 +12,13 @@ namespace RedisHost
 {
     class RedisListener : ICommunicationListener
     {
+        private readonly int _redisPort;
+
+        public RedisListener(int redisPort)
+        {
+            _redisPort = redisPort;
+        }
+
         public void Abort()
         {
             Process.GetProcessById(RedisHost.RedisPID).Kill();
@@ -25,8 +32,7 @@ namespace RedisHost
 
         public Task<string> OpenAsync(CancellationToken cancellationToken)
         {
-
-            return Task.FromResult($"{FabricRuntime.GetNodeContext().IPAddressOrFQDN}:6379");
+            return Task.FromResult($"{FabricRuntime.GetNodeContext().IPAddressOrFQDN}:{_redisPort}");
         }
     }
 }
