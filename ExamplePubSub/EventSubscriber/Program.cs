@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Runtime;
+using System;
 using System.Diagnostics;
-using System.Fabric;
 using System.Threading;
 
 namespace EventSubscriber
@@ -14,19 +14,19 @@ namespace EventSubscriber
         {
             try
             {
-                // Creating a FabricRuntime connects this host process to the Service Fabric runtime.
-                using (FabricRuntime fabricRuntime = FabricRuntime.Create())
-                {
-                    // The ServiceManifest.XML file defines one or more service type names.
-                    // RegisterServiceType maps a service type name to a .NET class.
-                    // When Service Fabric creates an instance of this service type,
-                    // an instance of the class is created in this host process.
-                    fabricRuntime.RegisterServiceType("EventSubscriberType", typeof(EventSubscriber));
+                // The ServiceManifest.XML file defines one or more service type names.
+                // Registering a service maps a service type name to a .NET type.
+                // When Service Fabric creates an instance of this service type,
+                // an instance of the class is created in this host process.
 
-                    ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(EventSubscriber).Name);
+                ServiceRuntime.RegisterServiceAsync("EventSubscriberType",
+                    serviceContext =>
+                    {
+                        return new EventSubscriber(serviceContext);
+                    }).GetAwaiter().GetResult();
+                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(EventSubscriber).Name);
 
-                    Thread.Sleep(Timeout.Infinite);  // Prevents this host process from terminating so services keeps running.
-                }
+                Thread.Sleep(Timeout.Infinite);  // Prevents this host process from terminating so services keeps running.
             }
             catch (Exception e)
             {

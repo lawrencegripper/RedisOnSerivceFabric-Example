@@ -14,7 +14,7 @@ Path to the file containing the publish profile.
 .PARAMETER ApplicationPackagePath
 Path to the folder of the packaged Service Fabric application.
 
-.PARAMETER DeloyOnly
+.PARAMETER DeployOnly
 Indicates that the Service Fabric application should not be created or upgraded after registering the application type.
 
 .PARAMETER ApplicationParameter
@@ -23,17 +23,29 @@ Hashtable of the Service Fabric application parameters to be used for the applic
 .PARAMETER UnregisterUnusedApplicationVersionsAfterUpgrade
 Indicates whether to unregister any unused application versions that exist after an upgrade is finished.
 
-.PARAMETER ForceUpgrade
-Indicates whether to force an upgrade to occur with hard-coded settings, ignoring any of the upgrade settings in the publish profile.
+.PARAMETER OverrideUpgradeBehavior
+Indicates the behavior used to override the upgrade settings specified by the publish profile.
+'None' indicates that the upgrade settings will not be overridden.
+'ForceUpgrade' indicates that an upgrade will occur with default settings, regardless of what is specified in the publish profile.
+'VetoUpgrade' indicates that an upgrade will not occur, regardless of what is specified in the publish profile.
 
 .PARAMETER UseExistingClusterConnection
 Indicates that the script should make use of an existing cluster connection that has already been established in the PowerShell session.  The cluster connection parameters configured in the publish profile are ignored.
 
 .PARAMETER OverwriteBehavior
 Overwrite Behavior if an application exists in the cluster with the same name. Available Options are Never, Always, SameAppTypeAndVersion. This setting is not applicable when upgrading an application.
-Never will not remove the existing application. This is the default behavior.
-Always will remove the existing application even if its Application type and Version is different from the application being created. 
-SameAppTypeAndVersion will remove the existing application only if its Application type and Version is same as the application being created.
+'Never' will not remove the existing application. This is the default behavior.
+'Always' will remove the existing application even if its Application type and Version is different from the application being created. 
+'SameAppTypeAndVersion' will remove the existing application only if its Application type and Version is same as the application being created.
+
+.PARAMETER SkipPackageValidation
+Switch signaling whether the package should be validated or not before deployment.
+
+.PARAMETER SecurityToken
+A security token for authentication to cluster management endpoints. Used for silent authentication to clusters that are protected by Azure Active Directory.
+
+.PARAMETER CopyPackageTimeoutSec
+Timeout in seconds for copying application package to image store.
 
 .EXAMPLE
 . Scripts\Deploy-FabricApplication.ps1 -ApplicationPackagePath 'pkg\Debug'
@@ -68,15 +80,25 @@ Param
     [Boolean]
     $UnregisterUnusedApplicationVersionsAfterUpgrade,
 
-    [Boolean]
-    $ForceUpgrade,
+    [String]
+    [ValidateSet('None', 'ForceUpgrade', 'VetoUpgrade')]
+    $OverrideUpgradeBehavior = 'None',
 
     [Switch]
     $UseExistingClusterConnection,
 
     [String]
     [ValidateSet('Never','Always','SameAppTypeAndVersion')]
-    $OverwriteBehavior
+    $OverwriteBehavior = 'Never',
+
+    [Switch]
+    $SkipPackageValidation,
+
+    [String]
+    $SecurityToken,
+
+    [int]
+    $CopyPackageTimeoutSec
 )
 
 function Read-XmlElementAsHashtable
@@ -117,6 +139,7 @@ function Read-PublishProfile
 
     $publishProfile.ClusterConnectionParameters = Read-XmlElementAsHashtable $publishProfileXml.PublishProfile.Item("ClusterConnectionParameters")
     $publishProfile.UpgradeDeployment = Read-XmlElementAsHashtable $publishProfileXml.PublishProfile.Item("UpgradeDeployment")
+    $publishProfile.CopyPackageParameters = Read-XmlElementAsHashtable $publishProfileXml.PublishProfile.Item("CopyPackageParameters")
 
     if ($publishProfileXml.PublishProfile.Item("UpgradeDeployment"))
     {
@@ -152,6 +175,10 @@ $publishProfile = Read-PublishProfile $PublishProfileFile
 if (-not $UseExistingClusterConnection)
 {
     $ClusterConnectionParameters = $publishProfile.ClusterConnectionParameters
+    if ($SecurityToken)
+    {
+        $ClusterConnectionParameters["SecurityToken"] = $SecurityToken
+    }
 
     try
     {
@@ -168,7 +195,30 @@ $RegKey = "HKLM:\SOFTWARE\Microsoft\Service Fabric SDK"
 $ModuleFolderPath = (Get-ItemProperty -Path $RegKey -Name FabricSDKPSModulePath).FabricSDKPSModulePath
 Import-Module "$ModuleFolderPath\ServiceFabricSDK.psm1"
 
-$IsUpgrade = ($publishProfile.UpgradeDeployment -and $publishProfile.UpgradeDeployment.Enabled) -or $ForceUpgrade
+$IsUpgrade = ($publishProfile.UpgradeDeployment -and $publishProfile.UpgradeDeployment.Enabled -and $OverrideUpgradeBehavior -ne 'VetoUpgrade') -or $OverrideUpgradeBehavior -eq 'ForceUpgrade'
+
+$PublishParameters = @{
+    'ApplicationPackagePath' = $ApplicationPackagePath
+    'ApplicationParameterFilePath' = $publishProfile.ApplicationParameterFile
+    'ApplicationParameter' = $ApplicationParameter
+    'ErrorAction' = 'Stop'
+}
+
+if ($publishProfile.CopyPackageParameters.CopyPackageTimeoutSec)
+{
+    $PublishParameters['CopyPackageTimeoutSec'] = $publishProfile.CopyPackageParameters.CopyPackageTimeoutSec
+}
+
+if ($publishProfile.CopyPackageParameters.CompressPackage)
+{
+    $PublishParameters['CompressPackage'] = $publishProfile.CopyPackageParameters.CompressPackage
+}
+
+# CopyPackageTimeoutSec parameter overrides the value from the publish profile
+if ($CopyPackageTimeoutSec)
+{
+    $PublishParameters['CopyPackageTimeoutSec'] = $CopyPackageTimeoutSec
+}
 
 if ($IsUpgrade)
 {
@@ -180,13 +230,17 @@ if ($IsUpgrade)
     
     $UpgradeParameters = $publishProfile.UpgradeDeployment.Parameters
 
-    if ($ForceUpgrade)
+    if ($OverrideUpgradeBehavior -eq 'ForceUpgrade')
     {
         # Warning: Do not alter these upgrade parameters. It will create an inconsistency with Visual Studio's behavior.
         $UpgradeParameters = @{ UnmonitoredAuto = $true; Force = $true }
     }
 
-    Publish-UpgradedServiceFabricApplication -ApplicationPackagePath $ApplicationPackagePath -ApplicationParameterFilePath $publishProfile.ApplicationParameterFile -Action $Action -UpgradeParameters $UpgradeParameters -ApplicationParameter $ApplicationParameter -UnregisterUnusedVersions:$UnregisterUnusedApplicationVersionsAfterUpgrade -ErrorAction Stop
+    $PublishParameters['Action'] = $Action
+    $PublishParameters['UpgradeParameters'] = $UpgradeParameters
+    $PublishParameters['UnregisterUnusedVersions'] = $UnregisterUnusedApplicationVersionsAfterUpgrade
+
+    Publish-UpgradedServiceFabricApplication @PublishParameters
 }
 else
 {
@@ -195,6 +249,10 @@ else
     {
         $Action = "Register"
     }
+
+    $PublishParameters['Action'] = $Action
+    $PublishParameters['OverwriteBehavior'] = $OverwriteBehavior
+    $PublishParameters['SkipPackageValidation'] = $SkipPackageValidation
     
-    Publish-NewServiceFabricApplication -ApplicationPackagePath $ApplicationPackagePath -ApplicationParameterFilePath $publishProfile.ApplicationParameterFile -Action $Action -ApplicationParameter $ApplicationParameter -OverwriteBehavior $OverwriteBehavior -ErrorAction Stop
+    Publish-NewServiceFabricApplication @PublishParameters
 }

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Fabric;
 
 namespace RedisHost
 {
@@ -15,6 +16,10 @@ namespace RedisHost
     /// </summary>
     internal sealed class RedisHost : StatelessService
     {
+        public RedisHost(StatelessServiceContext serviceContext) : base(serviceContext)
+        {
+        }
+
         public static int RedisPID { get; set; }
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
@@ -24,6 +29,7 @@ namespace RedisHost
 
         protected override async Task RunAsync(CancellationToken cancelServiceInstance)
         {
+            await Task.Yield();
 
             Process process = StartRedis();
             // This service instance continues processing until the instance is terminated.
