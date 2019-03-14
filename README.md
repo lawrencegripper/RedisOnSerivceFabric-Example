@@ -1,4 +1,4 @@
-# WARNING: Redis on Windows development appears to have stopped. See the archived repository here - https://github.com/MicrosoftArchive/redis. While this approach will still work you will be running an outdated version of Redis so it is **not** recommended. See details and discussion here: https://github.com/lawrencegripper/RedisOnSerivceFabric-Example/issues/3 
+# WARNING: Redis on Windows development appears to have stopped. See the archived repository here - https://github.com/MicrosoftArchive/redis. While this approach will still work you will be running an outdated version of Redis so it is **not** recommended.
 
 # RedisOnSerivceFabric-Example
 Quick example of running Redis as a service fabric service. This runs a single instance of Redis and doesn't persist data when a movement occurs between nodes. The movement cost is set to High to minimize the changes of this occuring. 
